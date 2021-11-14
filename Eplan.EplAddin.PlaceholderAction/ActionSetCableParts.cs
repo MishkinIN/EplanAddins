@@ -60,7 +60,7 @@ namespace Eplan.EplAddin.PlaceholderAction
                             ArticleReference metalHoseArticle = null;
                             bool isKnownCableDiameter = !String.IsNullOrWhiteSpace(strCableDiameter);
                             bool isFoundMetalHoseInPath = false;
-                            
+
 
                             string[] topologySegments = cablePath.Split(';');
                             double metalHoseLength = 0;
@@ -112,7 +112,7 @@ namespace Eplan.EplAddin.PlaceholderAction
 
                                 }
                             }
-                            if (metalHoseArticle!=null)
+                            if (metalHoseArticle != null)
                             {
                                 metalHoseArticle.StoreToObject();
                             }
@@ -146,15 +146,15 @@ namespace Eplan.EplAddin.PlaceholderAction
             if (null == ar)
             {
                 string strArticleNr = GetMetalHoseName(cableDiameter);
-                if (!func.IsLocked)
-                {
-                    func.SmartLock();
-                    ar = func.AddArticleReference(strArticleNr, strVariantNR: "1", nCount: 1, bClean: true); 
-                }
-                else
-                {
-                    throw new LockingExceptionFailedLockAttempt($"для внесения изменений требуется экслюзивный доступ к функции {func.Properties.FUNC_IDENTNAME}", func.ToStringIdentifier());
-                }
+                //if (!func.IsLocked)
+                //{
+                func.SmartLock();
+                ar = func.AddArticleReference(strArticleNr, strVariantNR: "1", nCount: 1, bClean: true);
+                //}
+                //else
+                //{
+                //    throw new LockingExceptionFailedLockAttempt($"Для внесения изменений требуется экслюзивный доступ к функции {func.Properties.FUNC_IDENTNAME}", func.ToStringIdentifier());
+                //}
             }
             else
             {
