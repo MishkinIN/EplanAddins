@@ -35,7 +35,7 @@ namespace Eplan.EplAddin.PlaceholderAction
         public bool Execute(ActionCallingContext oActionCallingContext)
         {
             SelectionSet set = new SelectionSet();
-            StorableObject[] storableObjects = set.Selection;
+            StorableObject[] storableObjects = set.SelectionRecursive/*Выбрать, включая вложенные уровни*/;
             if (storableObjects.Length > 0)
             {
                 EplApi.DataModel.Project project = null;
@@ -102,10 +102,13 @@ namespace Eplan.EplAddin.PlaceholderAction
                                                 isFoundMetalHoseInPath = true;
                                                 metalHoseLength = 0;
                                             }
-                                            double segmentLength = topologySegment.Properties.FUNC_CABLING_LENGTH;
-                                            metalHoseLength += segmentLength;
-                                            // К металлорукаву добавляем длину сегмента
-                                            metalHoseArticle.Properties.ARTICLE_PARTIAL_LENGTH_VALUE = metalHoseLength;
+                                            if (!topologySegment.Properties.FUNC_CABLING_LENGTH.IsEmpty)
+                                            {
+                                                double segmentLength = topologySegment.Properties.FUNC_CABLING_LENGTH;
+                                                metalHoseLength += segmentLength;
+                                                // К металлорукаву добавляем длину сегмента
+                                                metalHoseArticle.Properties.ARTICLE_PARTIAL_LENGTH_VALUE = metalHoseLength; 
+                                            }
                                         }
 
                                     }
