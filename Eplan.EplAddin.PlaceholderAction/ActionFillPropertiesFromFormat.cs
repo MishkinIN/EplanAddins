@@ -1,4 +1,6 @@
-﻿using Eplan.EplApi.ApplicationFramework;
+﻿// GNU General Public License v2.0 https://opensource.org/licenses/GPL-2.0
+// Copyright (c) 2021 Mishkin_Ivan@mail.ru
+using Eplan.EplApi.ApplicationFramework;
 using Eplan.EplApi.DataModel;
 using Eplan.EplApi.HEServices;
 using System;

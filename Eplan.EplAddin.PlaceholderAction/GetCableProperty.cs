@@ -1,5 +1,5 @@
-﻿// The MIT License (MIT) https://opensource.org/licenses/mit-license.php
-// Copyright (c) 2016 mivan12@mail.ru
+﻿// GNU General Public License v2.0 https://opensource.org/licenses/GPL-2.0
+// Copyright (c) 2021 Mishkin_Ivan@mail.ru
 using Eplan.EplApi.ApplicationFramework;
 using Eplan.EplApi.Base;
 using Eplan.EplApi.DataModel;
@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace Eplan.EplAddin.PlaceholderAction {
     /// <summary>
-    /// Фильтрует поле "Трасса маршрутизации" в отчете по кабелю для формирования таблицы соединений
+    /// Данная обработка фильтрует поле "Трасса маршрутизации" в отчете по кабелю для формирования таблицы соединений
     /// </summary>
     class GetCableProperty : IEplAction {
         // Фильтр по умолчанию:
