@@ -10,8 +10,7 @@ namespace Eplan.EplAddin.PlaceholderAction
 {
     /// <summary>
     /// Для кабеля просматриваем маршрут.
-    /// Для участков "Металлорукав" присваиваем наиболее подходящее по диаметру изделие из перечня изделий, присвоенных участку.
-    /// Если встретился переход "Лоток-Металлорукав", присваиваем переходник подходящего диаметра
+    /// Для участков маршрута с типом "Металлорукав" присваиваем наиболее подходящее по диаметру изделие из перечня знакомых изделий (Здесь - МРПИ).
     /// </summary>
     class ActionSetCableParts : IEplAction
     {
@@ -19,6 +18,9 @@ namespace Eplan.EplAddin.PlaceholderAction
         /// Диаметр кабеля по умолчанию. Принимается, если для изделия кабеля диаметр не указан
         /// </summary>
         public double DefaulfCableOuterDiameter = 12;
+        /// <summary>
+        /// Известные типы участков маршрута
+        /// </summary>
         public enum CABLINGSEGMENT_DUCT_TYPES
         {
             Лоток,
@@ -34,51 +36,52 @@ namespace Eplan.EplAddin.PlaceholderAction
         }
         public bool Execute(ActionCallingContext oActionCallingContext)
         {
+
             SelectionSet set = new SelectionSet();
-            StorableObject[] storableObjects = set.SelectionRecursive/*Выбрать, включая вложенные уровни*/;
+            StorableObject[] storableObjects = set.SelectionRecursive.Length > 0 // выделение выполнено в навигаторе
+                ? set.SelectionRecursive // Выбрать, включая вложенные уровни навигатора
+                : set.Selection; // либо выделение выполнено на листе
+
             if (storableObjects.Length > 0)
             {
                 EplApi.DataModel.Project project = null;
                 IEnumerable<Function> functionsQuery = null;
                 foreach (Eplan.EplApi.DataModel.EObjects.Cable funcCable in storableObjects.OfType<Eplan.EplApi.DataModel.EObjects.Cable>())
                 {
-                    var funcIsMain = funcCable.FunctionDefinition.IsMainFunction;
-                    //var funcIsCable = func.FunctionDefinition.Category == Function.Enums.Category.Cable;
-                    if (funcIsMain /*& funcIsCable*/)
+                    if (funcCable.FunctionDefinition.IsMainFunction)
                     {
-
                         project = project ?? funcCable.Project;
                         functionsQuery = project.Pages.SelectMany(p => p.Functions);
-                        PropertyValue pvCablePath = funcCable.Properties.CABLING_PATH;
-                        string cablePath = pvCablePath.ToString();
+                        string cablePath = funcCable.Properties.CABLING_PATH.ToString();
                         if (!String.IsNullOrWhiteSpace(cablePath))
                         {
                             string strCableDiameter = String.Empty;
                             double cableDiameter;
                             Article cableArticle = funcCable.Articles.Length > 0 ? funcCable.Articles[0] : null;
-                            strCableDiameter = cableArticle?.Properties.ARTICLE_OUTERDIAMETER;
-                            ArticleReference metalHoseArticle = null;
+                            strCableDiameter = cableArticle?.Properties.ARTICLE_OUTERDIAMETER.ToString();
                             bool isKnownCableDiameter = !String.IsNullOrWhiteSpace(strCableDiameter);
+                            cableDiameter = isKnownCableDiameter ? GetCableDiameter(strCableDiameter) : 0.0;
+                            ArticleReference metalHoseArticle = null;
                             bool isFoundMetalHoseInPath = false;
-
-
-                            string[] topologySegments = cablePath.Split(';');
                             double metalHoseLength = 0;
+
+                            // Разбиваем строку "Сегменты топологии" на имена сегментов
+                            string[] topologySegments = cablePath.Split(';');
                             foreach (string nameSegment in topologySegments)
                             {
-                                var topologySegment = functionsQuery
+                                // По имени сегмента извлекаем функцию
+                                EplApi.DataModel.Topology.Segment topologySegment = functionsQuery
                                     .OfType<EplApi.DataModel.Topology.Segment>()
                                     .FirstOrDefault(f => f.Properties.FUNC_IDENTNAME == nameSegment);
-                                if (null != topologySegment)
+                                if (null != topologySegment) //Нашли очередной сегмент топологии
                                 {
-                                    //Нашли очередной сегмент топологии
-                                    // var cabblingSegment_DustType = topologySegment.Properties.CABLINGSEGMENT_DUCT_TYPE;
-
+                                    // Обрабатываем свойство сегмента "[20345] Тип семента маршрутизации"
                                     var cabblingSegment_DustType = topologySegment.Properties.CABLINGSEGMENT_DUCT_TYPE;
                                     if (cabblingSegment_DustType.IsEmpty)
                                     {
                                         continue;
                                     }
+                                    // Свойство [20345] - мультиязыковая строка. Значение может быть занесено как интернациональное или ru-Ru
                                     string dustType = cabblingSegment_DustType.ToMultiLangString()
                                         .GetString(EplApi.Base.ISOCode.Language.L___);
                                     if (String.IsNullOrEmpty(dustType))
@@ -89,15 +92,14 @@ namespace Eplan.EplAddin.PlaceholderAction
                                     }
                                     if (isKnownCableDiameter)
                                     {
-                                        cableDiameter = GetCableDiameter(strCableDiameter);
                                         // Для сегмента с типом "Металлорукав" к кабелю добавляем изделие металлорукава.
                                         if (isMetalHose(dustType))
                                         {
                                             if (!isFoundMetalHoseInPath) // Если это первый найденный сегмент металлорукава
                                             {
-                                                // находим первое изделие металлорукава
-                                                // и перезаписываем на металлорукав нужного диаметра
+                                                // находим первое изделие металлорукава и перезаписываем на металлорукав нужного диаметра
                                                 metalHoseArticle = GetOrAddMetalHoseArticleRef(funcCable, cableDiameter);
+                                                // Длина будет вычислена заново
                                                 metalHoseArticle.Properties.ARTICLE_PARTIAL_LENGTH_IN_PROJECT_UNIT = 0;
                                                 isFoundMetalHoseInPath = true;
                                                 metalHoseLength = 0;
@@ -107,7 +109,7 @@ namespace Eplan.EplAddin.PlaceholderAction
                                                 double segmentLength = topologySegment.Properties.FUNC_CABLING_LENGTH;
                                                 metalHoseLength += segmentLength;
                                                 // К металлорукаву добавляем длину сегмента
-                                                metalHoseArticle.Properties.ARTICLE_PARTIAL_LENGTH_VALUE = metalHoseLength; 
+                                                metalHoseArticle.Properties.ARTICLE_PARTIAL_LENGTH_VALUE = metalHoseLength;
                                             }
                                         }
 
@@ -117,6 +119,7 @@ namespace Eplan.EplAddin.PlaceholderAction
                             }
                             if (metalHoseArticle != null)
                             {
+                                // 
                                 metalHoseArticle.StoreToObject();
                             }
                         }
@@ -149,15 +152,8 @@ namespace Eplan.EplAddin.PlaceholderAction
             if (null == ar)
             {
                 string strArticleNr = GetMetalHoseName(cableDiameter);
-                //if (!func.IsLocked)
-                //{
                 func.SmartLock();
                 ar = func.AddArticleReference(strArticleNr, strVariantNR: "1", nCount: 1, bClean: true);
-                //}
-                //else
-                //{
-                //    throw new LockingExceptionFailedLockAttempt($"Для внесения изменений требуется экслюзивный доступ к функции {func.Properties.FUNC_IDENTNAME}", func.ToStringIdentifier());
-                //}
             }
             else
             {
@@ -167,17 +163,21 @@ namespace Eplan.EplAddin.PlaceholderAction
             ar.StoreToObject();
             return ar;
         }
-
+        /// <summary>
+        /// Возвращает имя изделия металлорукава как "МРПИnn", где nn = подходящий диаметр металлорукава
+        /// </summary>
+        /// <param name="cableDiameter">Диаметр кабеля, затягиваемого в металлорукав</param>
+        /// <returns></returns>
         private string GetMetalHoseName(double cableDiameter)
         {
+                //МРПИ15
+                //МРПИ20
+                //МРПИ25
+                //МРПИ32
+                //МРПИ38
             return "МРПИ" + GetMetalHoseDy(cableDiameter);
             int GetMetalHoseDy(double d)
             {
-                //МРПИ15
-                //            МРПИ20
-                //            МРПИ25
-                //МРПИ32
-                //МРПИ38
 
                 if (d < 10.0)
                 {
