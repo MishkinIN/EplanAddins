@@ -1,4 +1,4 @@
-// GNU General Public License v2.0 https://opensource.org/licenses/GPL-2.0
+// GNU General Public License v3.0 https://opensource.org/licenses/GPL-3.0
 // Copyright (c) 2021 Mishkin_Ivan@mail.ru
 using System;
 using Eplan.EplApi.ApplicationFramework;
@@ -37,7 +37,7 @@ namespace Eplan.EplAddin.PlaceholderAction
             {
                 foreach (var id in nCommandId)
                 {
-                    ourMenu.RemoveMenuItem(id);
+                   if (id>0) ourMenu.RemoveMenuItem(id);
                 }
                 ourMenu.Dispose();
                 ourMenu = null;
@@ -62,19 +62,9 @@ namespace Eplan.EplAddin.PlaceholderAction
         public bool OnInitGui()
         {
             ourMenu = ourMenu ?? new Menu();
-            nCommandId[0] = ourMenu.AddMainMenu("Обработка", Menu.MainMenuName.eMainMenuUtilities, "Заполнить свойства для  формы ТВВ", "CopyProperties20202",
-                "Перенос свойств блока в свойства для формы ТВВ", 2);
-            nCommandId[1] = ourMenu.AddMenuItem("Пронумеровать страницы томов", "NumberPagesInProperty11031", "Нумерация страниц", nCommandId[0], Int16.MaxValue, false, false);
-            nCommandId[2] = ourMenu.AddMenuItem("Пронумеровать доп. поле номера листа", "NumberPagesIn11033", "Нумерация доп. номеров листа", nCommandId[0], Int16.MaxValue, false, false);
-            nCommandId[3] = ourMenu.AddMenuItem(strText:"Для кабелей присвоить изделие металлорукава",
-                strActionName: ActionSetCableParts.ActionName,
-                strStatusText: "Присвоение металлорукавов для кабелей", 
-                nCommandId: nCommandId[0],
-                nInsertPosition: Int16.MaxValue,
-                bSeparatorBefore: false,
-                bSeparatorBehind: false);
+            nCommandId[0] = ourMenu.AddMainMenu("Обработка", Menu.MainMenuName.eMainMenuUtilities, "Для кабелей присвоить изделие металлорукава", ActionSetCableParts.ActionName,
+                "Присвоение металлорукавов для кабелей", 1);
             return true;
-
         }
         /// <summary>
         /// This function is called during closing P8 or unregistration the add-in. 
@@ -86,7 +76,7 @@ namespace Eplan.EplAddin.PlaceholderAction
             {
                 foreach (var id in nCommandId)
                 {
-                    ourMenu.RemoveMenuItem(id);
+                    if (id>0) ourMenu.RemoveMenuItem(id);
                 }
                 ourMenu.Dispose();
                 ourMenu = null;

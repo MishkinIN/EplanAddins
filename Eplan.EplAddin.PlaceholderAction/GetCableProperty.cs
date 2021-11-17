@@ -1,4 +1,4 @@
-﻿// GNU General Public License v2.0 https://opensource.org/licenses/GPL-2.0
+﻿// GNU General Public License v3.0 https://opensource.org/licenses/GPL-3.0
 // Copyright (c) 2021 Mishkin_Ivan@mail.ru
 using Eplan.EplApi.ApplicationFramework;
 using Eplan.EplApi.Base;

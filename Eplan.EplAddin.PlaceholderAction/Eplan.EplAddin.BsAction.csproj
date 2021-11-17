@@ -8,8 +8,8 @@
     <ProjectGuid>{F6F30FFB-2EAB-4906-A405-EDC89368FA60}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Eplan.EplAddin.PlaceholderAction</RootNamespace>
-    <AssemblyName>Eplan.EplAddin.PlaceholderAction</AssemblyName>
+    <RootNamespace>Eplan.EplAddin.CablePartsAction</RootNamespace>
+    <AssemblyName>Eplan.EplAddin.CablePartsAction</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
@@ -82,9 +82,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionSetCableParts.cs" />
-    <Compile Include="ActionFillPropertiesFromFormat.cs" />
-    <Compile Include="ActionNumberPages11033.cs" />
-    <Compile Include="ActionNumberPages.cs" />
     <Compile Include="addinmodule.cs" />
     <Compile Include="GetCableProperty.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

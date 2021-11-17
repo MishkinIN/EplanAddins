@@ -1,16 +1,15 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Eplan.EplAddin.PlaceholderAction")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Eplan.EplAddin.BsAction")]
+[assembly: AssemblyDescription("Eplan addins for automation projects")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Eplan.EplAddin.PlaceholderAction")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyProduct("Eplan.EplAddin.BsAction")]
+[assembly: AssemblyCopyright("Copyright © 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -29,5 +28,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.1.0.021")]
-//[assembly: AssemblyFileVersion("1.1.0.001")]
+[assembly: AssemblyVersion("1.1.0.022")]
+
