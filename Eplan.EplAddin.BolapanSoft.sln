@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eplan.EplAddin.BsAction", "Eplan.EplAddin.PlaceholderAction\Eplan.EplAddin.BsAction.csproj", "{F6F30FFB-2EAB-4906-A405-EDC89368FA60}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eplan.EplAddin.CablePartsAction", "Eplan.EplAddin.CablePartsAction\Eplan.EplAddin.CablePartsAction.csproj", "{F6F30FFB-2EAB-4906-A405-EDC89368FA60}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
